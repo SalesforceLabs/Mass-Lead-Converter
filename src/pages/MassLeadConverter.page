@@ -1,0 +1,116 @@
+<!-- 
+Copyright (c) 2011, salesforce.com, Inc.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, 
+are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, 
+    this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice, 
+    this list of conditions and the following disclaimer in the documentation 
+    and/or other materials provided with the distribution.
+    * Neither the name of the salesforce.com, Inc. nor the names of its contributors 
+    may be used to endorse or promote products derived from this software 
+    without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
+OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<apex:page StandardController="Lead" recordSetVar="leads" extensions="MassLeadConverterController" >
+ <apex:sectionHeader title="Mass Convert Leads" subtitle="" />
+
+<apex:pageBlock >
+
+           <apex:pageBlockTable value="{!selected}" var="selectedLead">
+                <apex:column value="{!selectedLead.Name}"/>  
+                <apex:column value="{!selectedLead.Company}"/>
+                <apex:column value="{!selectedLead.Phone}"/>
+                <apex:column value="{!selectedLead.OwnerId} " rendered="false" /> 
+                <apex:column value="{!selectedLead.City} " rendered="false" />  
+                <apex:column value="{!selectedLead.Country} " rendered="false" />  
+                <apex:column value="{!selectedLead.PostalCode} " rendered="false" />  
+                <apex:column value="{!selectedLead.State} " rendered="false" />  
+                <apex:column value="{!selectedLead.Street} " rendered="false" />  
+                <apex:column value="{!selectedLead.Fax} " rendered="false" />  
+                <apex:column value="{!selectedLead.Rating} " rendered="false" />  
+                <apex:column value="{!selectedLead.NumberOfEmployees} " rendered="false" />  
+                <apex:column value="{!selectedLead.Website} " rendered="false" />  
+                 
+            </apex:pageBlockTable>
+</apex:pageBlock>
+<apex:form id="form" >
+
+<apex:pageBlock title="Mass Convert Leads" mode="edit" >
+<apex:pageBlockSection title="Mass Convert Leads" columns="1" id="mcBox" rendered="{!isEditable}">
+	<apex:pageBlockSectionItem >
+		<apex:outputLabel for="recordOwner" value="Record Owner" />
+		<apex:inputField value="{!acc.OwnerId}" id="recordOwner" />
+	</apex:pageBlockSectionItem>
+	<apex:pageBlockSectionItem >
+		<apex:outputLabel for="sendEmailBox" value="Send Email to Owner" />
+		<apex:inputCheckbox value="{!sendEmailBox}" id="sendEmailBox" /> 
+	</apex:pageBlockSectionItem>
+	<apex:actionRegion >
+	<apex:selectRadio value="{!accOption}" layout="pageDirection">
+            <apex:selectOptions value="{!accOptions}"/>    
+                <apex:actionSupport event="onclick" reRender="accName,existingAcc" status="..." />
+              
+    </apex:selectRadio>
+   <apex:pageBlockSectionItem >
+		<apex:outputLabel for="accName" value="New Account Name" />
+		<apex:inputText value="{!accountName}" id="accName" disabled="{!accOption != 'Create new account'}" /> 
+	</apex:pageBlockSectionItem>
+	<BR />
+    <apex:pageBlockSectionItem >
+		<apex:outputLabel for="existingAccName" value="Existing Account" />
+		<apex:outputPanel id="existingAcc" ><apex:inputField value="{!con.AccountId}" id="existingAccName" /> 
+			<script>document.getElementById('{!$Component.existingAccName}').disabled = {!JSENCODE(accOption) == 'Create new account'}; </script>
+		</apex:outputPanel>
+	</apex:pageBlockSectionItem>
+ 	</apex:actionRegion>
+
+</apex:pageBlockSection>
+<apex:pageBlockSection title="Opportunity Information" columns="1" rendered="{!isEditable}">
+		<apex:actionRegion >
+		<apex:selectRadio value="{!oppOption}" layout="pageDirection">
+            <apex:selectOptions value="{!oppOptions}"/>
+             <apex:actionSupport event="onclick" reRender="oppName" status="..." />
+            </apex:selectRadio>
+	<apex:pageBlockSectionItem >
+		<apex:outputLabel for="oppName" value="Opportunity Name" />
+		<apex:inputText value="{!opportunityName}" id="oppName" disabled="{!oppOption == 'Do not create new opportunity'}" /> 
+	</apex:pageBlockSectionItem>
+	</apex:actionRegion>
+</apex:pageBlockSection>
+
+<apex:pageBlockSection title="Task Information" columns="1" rendered="{!isEditable}">
+		<apex:selectRadio value="{!taskOption}" layout="pageDirection">
+            <apex:selectOptions value="{!taskOptions}"/>
+            </apex:selectRadio>
+	<apex:inputField value="{!leadTask.ActivityDate}" />
+	<apex:inputField value="{!leadTask.Subject}" />
+	<apex:inputField value="{!leadTask.Status}" />
+	<apex:inputField value="{!leadTask.Description}" />
+	<apex:inputField value="{!leadTask.Priority}" />
+	<apex:inputField value="{!leadTask.ReminderDateTime}" />
+	<apex:inputField value="{!leadTask.isReminderSet}" />
+	
+</apex:pageBlockSection>
+    <apex:pageMessages />
+	<BR />	
+           <apex:pageBlockButtons location="bottom">   
+                <apex:commandButton value="Save" rerender="form" action="{!convertLeads}" rendered="{!isEditable}" />
+                <apex:commandButton value="Cancel" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+</apex:pageBlock>
+</apex:form>
+</apex:page>
